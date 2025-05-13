@@ -1,8 +1,8 @@
-# 361-MicroserviceA
-Logging Microservice for Package Tracker
-Micoservice logs message from application to log file. This microservice monitors text file for log requests, processes, and stores in a log file. 
+#Logging Microservice for Package Tracker
 
-Communication Contract
+#Micoservice logs message from application to log file. This microservice monitors text file for log requests, processes, and stores in a log file. 
+
+#Communication Contract
 
 How to Request Data:
 Logging microservice accepts requests via text file communication pipe. 
@@ -20,11 +20,11 @@ Example:
 def send_log(message, service_file="io/logger-service.txt"):
     """Send a log message to the microservice"""
     try:
-        # Create directory if it doesn't exist
+        #Create directory if it doesn't exist
         import os
         os.makedirs(os.path.dirname(service_file), exist_ok=True)
         
-        # Write the log request to the service file
+        #Write the log request to the service file
         with open(service_file, "w") as file:
             file.write(f"LOG|{message}")
         return True
@@ -33,8 +33,6 @@ def send_log(message, service_file="io/logger-service.txt"):
         return False
 example:
 send_log("Package PKG123456 created")
-
-
 
 
 How to Receive Data:

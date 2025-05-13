@@ -1,0 +1,57 @@
+import os
+import time
+
+class LoggingMicroservice:
+    def __init__(self, service_file="io/logger-service.txt", log_file="io/log.txt"):
+        self.service_file = service_file
+        self.log_file = log_file
+        self.prefix = "LOG|"
+        self.ensure_directories_exist()
+        
+    def ensure_directories_exist(self):
+        """Ensure the io directory exists"""
+        os.makedirs(os.path.dirname(self.service_file), exist_ok=True)
+        
+    def run(self):
+        """Start the microservice loop"""
+        print(f"Logging microservice started. Monitoring {self.service_file}")
+        
+        while True:
+            try:
+                # Check if service file exists
+                if os.path.exists(self.service_file):
+                    # Read the service file
+                    with open(self.service_file, "r") as file:
+                        content = file.read().strip()
+                    
+                    # Process the log message if it has the correct prefix
+                    if content.startswith(self.prefix):
+                        # Extract the message (remove prefix)
+                        message = content[len(self.prefix):]
+                        
+                        # Add timestamp to the log entry
+                        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+                        log_entry = f"[{timestamp}] {message}"
+                        
+                        # Append to log file
+                        with open(self.log_file, "a") as log:
+                            log.write(log_entry + "\n")
+                            
+                        print(f"Log processed: {log_entry}")
+                    else:
+                        print(f"Invalid log format, missing prefix: {content}")
+                    
+                    # Delete the service file after processing
+                    os.remove(self.service_file)
+                
+                # Sleep for a short time to avoid high CPU usage
+                time.sleep(0.1)
+                
+            except Exception as e:
+                print(f"Error in logging microservice: {e}")
+                # Continue running despite errors
+                time.sleep(1)
+
+if __name__ == "__main__":
+    service = LoggingMicroservice()
+    service.run()

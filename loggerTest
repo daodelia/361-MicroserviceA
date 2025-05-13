@@ -1,0 +1,69 @@
+import os
+import time
+
+class LoggerTest:
+    def __init__(self, service_file="io/logger-service.txt", log_file="io/log.txt"):
+        self.service_file = service_file
+        self.log_file = log_file
+        self.ensure_directories_exist()
+        
+    def ensure_directories_exist(self):
+        """Ensure the io directory exists"""
+        os.makedirs(os.path.dirname(self.service_file), exist_ok=True)
+    
+    def send_log(self, message):
+        """Send a log message to the microservice"""
+        print(f"Sending log message: {message}")
+        try:
+            with open(self.service_file, "w") as file:
+                file.write(f"LOG|{message}")
+            return True
+        except Exception as e:
+            print(f"Logging failed: {e}")
+            return False
+    
+    def read_logs(self):
+        """Read all logs from the log file"""
+        print("\nReading logs:")
+        if not os.path.exists(self.log_file):
+            print("No log file found")
+            return []
+            
+        try:
+            with open(self.log_file, "r") as file:
+                logs = file.readlines()
+            return [log.strip() for log in logs]
+        except Exception as e:
+            print(f"Error reading logs: {e}")
+            return []
+
+# Test the logger
+def run_test():
+    tester = LoggerTest()
+    
+    # Send multiple log entries
+    test_logs = [
+        "Application started",
+        "User login: user123",
+        "Package PKG123456 created",
+        "ERROR: Connection timeout",
+        "Package PKG123456 updated: status=shipped",
+        "User logout: user123"
+    ]
+    
+    for log in test_logs:
+        tester.send_log(log)
+        print(f"Waiting for microservice to process log...")
+        time.sleep(1)  # Give the microservice time to process
+        
+    # Read and display all logs
+    logs = tester.read_logs()
+    if logs:
+        for i, log in enumerate(logs, 1):
+            print(f"{i}. {log}")
+    else:
+        print("No logs found. Make sure the microservice is running.")
+
+if __name__ == "__main__":
+    print("Starting Logger Test Program")
+    run_test()
